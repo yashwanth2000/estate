@@ -16,9 +16,16 @@ const LogIn = () => {
       [e.target.id]: e.target.value,
     });
   };
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const isFormValid = () => {
+    const { email, password } = formData;
+    return password.length >= 4 && emailRegex.test(email);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
     try {
       setLoading(true);
       const res = await fetch("/auth/login", {
@@ -29,17 +36,32 @@ const LogIn = () => {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      if (data.success == false) {
+
+      if (!isFormValid()) {
+        setError("Please enter valid credentials.");
+        setLoading(false);
+        return;
+      }
+
+      if (data.success === false) {
         setError(data.message);
         setLoading(false);
         return;
       }
+
       setLoading(false);
       setError(null);
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       setLoading(false);
-      setError(error.message);
+      if (
+        error instanceof SyntaxError &&
+        error.message === "Unexpected end of JSON input"
+      ) {
+        setError("Server error: Unable to process response.");
+      } else {
+        setError(error.message);
+      }
     }
   };
 
