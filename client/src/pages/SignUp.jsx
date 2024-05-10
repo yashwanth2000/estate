@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import OAuth from "../components/OAuth";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({});
@@ -142,12 +143,7 @@ const SignUp = () => {
               <span className="mx-4 text-gray-500">OR</span>
               <div className="h-px bg-gray-300 w-full"></div>
             </div>
-            <button
-              type="button"
-              className="w-full bg-red-600 text-white font-semibold py-2 rounded-md hover:bg-red-700 transition-colors"
-            >
-              Sign Up with Google
-            </button>
+            <OAuth />
           </form>
           <div className="mt-4 text-center">
             <p className="inline-block text-gray-600 mr-2">

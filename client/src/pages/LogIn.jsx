@@ -7,6 +7,7 @@ import {
   loginSuccess,
   loginFailure,
 } from "../redux/user/userSlice";
+import OAuth from "../components/OAuth";
 
 const LogIn = () => {
   const [formData, setFormData] = useState({});
@@ -49,7 +50,7 @@ const LogIn = () => {
 
       if (data.rest) {
         //console.log("User data from server:", data.rest);
-        dispatch(loginSuccess(data.rest));
+        dispatch(loginSuccess(data));
         navigate("/");
       } else {
         //console.log("Login failed:", data.message);
@@ -129,12 +130,7 @@ const LogIn = () => {
             <span className="mx-4 text-gray-500">OR</span>
             <div className="h-px bg-gray-300 w-full"></div>
           </div>
-          <button
-            type="button"
-            className="w-full bg-red-600 text-white font-semibold py-2 rounded-md hover:bg-red-700 transition-colors"
-          >
-            LogIn with Google
-          </button>
+          <OAuth />
         </form>
         <div className="mt-4 text-center">
           <p className="inline-block text-gray-600 mr-2">
