@@ -1,13 +1,18 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  loginStart,
+  loginSuccess,
+  loginFailure,
+} from "../redux/user/userSlice";
 
 const LogIn = () => {
   const [formData, setFormData] = useState({});
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const { loading, error } = useSelector((state) => state.user);
   const [showPassword, setShowPassword] = useState(false);
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -25,9 +30,8 @@ const LogIn = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
     try {
-      setLoading(true);
+      dispatch(loginStart());
       const res = await fetch("/auth/login", {
         method: "POST",
         headers: {
@@ -36,31 +40,29 @@ const LogIn = () => {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
+      //console.log("Server response:", data);
 
       if (!isFormValid()) {
-        setError("Please enter valid credentials.");
-        setLoading(false);
+        dispatch(loginFailure("Please enter valid credentials."));
         return;
       }
 
-      if (data.success === false) {
-        setError(data.message);
-        setLoading(false);
-        return;
+      if (data.rest) {
+        //console.log("User data from server:", data.rest);
+        dispatch(loginSuccess(data.rest));
+        navigate("/");
+      } else {
+        //console.log("Login failed:", data.message);
+        dispatch(loginFailure(data.message));
       }
-
-      setLoading(false);
-      setError(null);
-      navigate("/");
     } catch (error) {
-      setLoading(false);
       if (
         error instanceof SyntaxError &&
         error.message === "Unexpected end of JSON input"
       ) {
-        setError("Server error: Unable to process response.");
+        dispatch(loginFailure("Server error: Unable to process response."));
       } else {
-        setError(error.message);
+        dispatch(loginFailure(error.message));
       }
     }
   };

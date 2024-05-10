@@ -27,13 +27,14 @@ export default function Header() {
             </li>
           </Link>
           <Link to={"/about"}>
-          <li className=" text-slate-700 font-mono relative px-8 py-2 rounded-md bg-slate-200 isolation-auto z-10 border before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-blue-500 before:-z-10 before:aspect-square before:hover:scale-150 overflow-hidden before:hover:duration-700">
+            <li className=" text-slate-700 font-mono relative px-8 py-2 rounded-md bg-slate-200 isolation-auto z-10 border before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-blue-500 before:-z-10 before:aspect-square before:hover:scale-150 overflow-hidden before:hover:duration-700">
               About
             </li>
           </Link>
           <Link to={"/login"}>
-          <li className=" text-slate-700 font-mono relative px-8 py-2 rounded-md bg-slate-200 isolation-auto z-10 border before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-blue-500 before:-z-10 before:aspect-square before:hover:scale-150 overflow-hidden before:hover:duration-700">
-            Login</li>
+            <li className=" text-slate-700 font-mono relative px-8 py-2 rounded-md bg-slate-200 isolation-auto z-10 border before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-blue-500 before:-z-10 before:aspect-square before:hover:scale-150 overflow-hidden before:hover:duration-700">
+              Login
+            </li>
           </Link>
         </ul>
       </div>
