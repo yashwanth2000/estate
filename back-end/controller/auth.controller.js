@@ -51,19 +51,31 @@ const google = async (req, res, next) => {
     } else {
       const generatePassword = Math.random().toString(36).slice(-8);
       const hashedPassword = bcrypt.hashSync(generatePassword, 10);
+      let username = req.body.name.replace(/\s+/g, "").toLowerCase();
+
+      // Check if the username already exists and generate a unique one if necessary
+      let existingUser = await User.findOne({ username });
+      let counter = 1;
+      while (existingUser) {
+        username = `${req.body.name.replace(/\s+/g, "").toLowerCase()}_${counter}`;
+        existingUser = await User.findOne({ username });
+        counter++;
+      }
+
       const newUser = new User({
-        username:
-          req.body.username.split(" ").join("").toLowerCase() +
-          Math.random().toString(36).slice(-4),
+        username,
         email: req.body.email,
         password: hashedPassword,
         avatar: req.body.photo,
       });
+      
       await newUser.save();
-      const token = jwt.sign({ id: newUser._id},process.env.JWT_SECRET);
-      const {password: pass, ...rest} = newUser._doc;
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+      const { password: pass, ...rest } = newUser._doc;
       res
-        .cookie("access_token", token, { httpOnly: true }).status(200).json(rest);  
+        .cookie("access_token", token, { httpOnly: true })
+        .status(200)
+        .json(rest);
     }
   } catch (error) {
     next(error);

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import OAuth from "../components/OAuth";
+import { ToastContainer, toast, Zoom } from "react-toastify";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({});
@@ -20,7 +21,7 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-
+  
     try {
       setLoading(true);
       const res = await fetch("/auth/signup", {
@@ -30,9 +31,9 @@ const SignUp = () => {
         },
         body: JSON.stringify(formData),
       });
-
+  
       const data = await res.json();
-
+  
       if (data.success === false) {
         if (data.message.includes("username")) {
           setError("User already exists.");
@@ -46,7 +47,19 @@ const SignUp = () => {
       } else {
         setLoading(false);
         setError(null);
-        navigate("/login");
+        toast.success("Sign up successful! Please log in.", {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          theme: "dark",
+          transition: Zoom,
+        });
+        setTimeout(() => {
+          navigate("/login"); 
+        }, 1000);
       }
     } catch (error) {
       setLoading(false);
@@ -158,6 +171,7 @@ const SignUp = () => {
           </div>
           {error && <p className="mt-4 text-red-600">{error}</p>}
         </div>
+        <ToastContainer />
       </div>
     </>
   );

@@ -8,6 +8,7 @@ import {
   loginFailure,
 } from "../redux/user/userSlice";
 import OAuth from "../components/OAuth";
+import { ToastContainer, toast,Zoom } from 'react-toastify';
 
 const LogIn = () => {
   const [formData, setFormData] = useState({});
@@ -41,7 +42,7 @@ const LogIn = () => {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      //console.log("Server response:", data);
+     
 
       if (!isFormValid()) {
         dispatch(loginFailure("Please enter valid credentials."));
@@ -49,11 +50,21 @@ const LogIn = () => {
       }
 
       if (data.rest) {
-        //console.log("User data from server:", data.rest);
         dispatch(loginSuccess(data));
-        navigate("/");
-      } else {
-        //console.log("Login failed:", data.message);
+        toast.success("Login Successfull", {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          theme: "dark",
+          transition : Zoom
+        });
+        setTimeout(() => {
+          navigate("/");
+        }, 1000); 
+      }  else {
         dispatch(loginFailure(data.message));
       }
     } catch (error) {
@@ -146,6 +157,7 @@ const LogIn = () => {
 
         {error && <p className="mt-4 text-red-600">{error}</p>}
       </div>
+      <ToastContainer />
     </div>
   );
 };
