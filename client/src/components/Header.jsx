@@ -1,7 +1,10 @@
 import { FaSearch } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function Header() {
+  const { currentUser } = useSelector((state) => state.user);
+
   return (
     <header className="bg-slate-200 shadow-md">
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
@@ -44,14 +47,22 @@ export default function Header() {
             About
           </NavLink>
           <NavLink
-            to="/login"
+            to="/profile"
             className={({ isActive }) =>
               isActive
                 ? "text-white-700 font-mono relative px-8 py-2 rounded-md bg-slate-200 isolation-auto z-10 border before:absolute before:transition-all before:duration-700 before:w-full before:left-0 before:rounded-full before:bg-blue-500 before:-z-10 before:aspect-square before:scale-150 overflow-hidden"
                 : "text-slate-700 font-mono relative px-8 py-2 rounded-md bg-slate-200 isolation-auto z-10 border before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-blue-500 before:-z-10 before:aspect-square before:hover:scale-150 overflow-hidden before:hover:duration-700"
             }
           >
-            Login
+            {currentUser ? (
+              <img
+                className="rounded-full h-7 w-7 object-cover"
+                src={currentUser.avatar}
+                alt=""
+              />
+            ) : (
+              "Login"
+            )}
           </NavLink>
         </ul>
       </div>

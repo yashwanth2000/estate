@@ -29,7 +29,6 @@ const login = async (req, res, next) => {
     const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
     const { password: pass, ...rest } = validUser._doc;
     res.cookie("access_token", token, { httpOnly: true }).status(200).json({
-      message: "Login Successful",
       rest,
       token,
     });
@@ -57,7 +56,9 @@ const google = async (req, res, next) => {
       let existingUser = await User.findOne({ username });
       let counter = 1;
       while (existingUser) {
-        username = `${req.body.name.replace(/\s+/g, "").toLowerCase()}_${counter}`;
+        username = `${req.body.name
+          .replace(/\s+/g, "")
+          .toLowerCase()}_${counter}`;
         existingUser = await User.findOne({ username });
         counter++;
       }
@@ -68,7 +69,7 @@ const google = async (req, res, next) => {
         password: hashedPassword,
         avatar: req.body.photo,
       });
-      
+
       await newUser.save();
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
       const { password: pass, ...rest } = newUser._doc;
@@ -82,4 +83,4 @@ const google = async (req, res, next) => {
   }
 };
 
-module.exports = { signup, login,google };
+module.exports = { signup, login, google };
