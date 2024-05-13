@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/user.route");
 const authRouter = require("./routes/auth.route");
 
@@ -9,6 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
 
 mongoose
   .connect(process.env.MONGODB_URL)
@@ -24,6 +26,7 @@ mongoose
   });
 
 app.use("/auth", authRouter);
+app.use("/user", userRouter);
 
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;
