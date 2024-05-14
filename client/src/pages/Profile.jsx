@@ -11,6 +11,12 @@ import {
   updateUserSuccess,
   updateUserStart,
   updateUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFailure,
+  logOutSuccess,
+  logOutStart,
+  logOutFailure,
 } from "../redux/user/userSlice";
 import { Slide, toast, ToastContainer, Zoom } from "react-toastify";
 
@@ -119,6 +125,39 @@ const Profile = () => {
     }
   };
 
+  const handleDeleteUser = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const userId = currentUser.rest ? currentUser.rest._id : currentUser._id;
+      const res = await fetch(`/user/delete/${userId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if(data.success === false){
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
+    }
+  }
+
+  const handleLogOut = async () => {
+    try {
+      dispatch(logOutStart());
+      const res = await fetch("/auth/logout");
+      const data = await res.json();
+      if(data.success === false){
+        dispatch(logOutFailure(data.message));
+        return;
+      }
+      dispatch(logOutSuccess(data));
+    } catch (error) {
+      dispatch(logOutFailure(error.message));
+    }
+  }
+
   return (
     <div className="flex flex-col items-center p-8 max-w-md mx-auto mt-10 bg-white rounded-lg shadow-md">
       <form onSubmit={handleSubmit} className="w-full">
@@ -201,10 +240,10 @@ const Profile = () => {
         </button>
       </form>
       <div className="flex justify-between mt-6 w-full">
-        <button className="text-red-600 hover:text-red-700 transition-colors duration-300">
+        <button className="text-red-600 hover:text-red-700 transition-colors duration-300" onClick={handleDeleteUser}>
           Delete Account
         </button>
-        <button className="text-red-600 hover:text-red-700 transition-colors duration-300">
+        <button className="text-red-600 hover:text-red-700 transition-colors duration-300" onClick={handleLogOut}>
           Sign Out
         </button>
       </div>

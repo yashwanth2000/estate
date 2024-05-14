@@ -46,7 +46,7 @@ const google = async (req, res, next) => {
       res
         .cookie("access_token", token, { httpOnly: true })
         .status(200)
-        .json({ success: true, data: rest });
+        .json({ success: true, rest });
     } else {
       const generatePassword = Math.random().toString(36).slice(-8);
       const hashedPassword = bcrypt.hashSync(generatePassword, 10);
@@ -76,11 +76,20 @@ const google = async (req, res, next) => {
       res
         .cookie("access_token", token, { httpOnly: true })
         .status(200)
-        .json({ success: true, data: rest });
+        .json({ success: true, rest });
     }
   } catch (error) {
     next(error);
   }
 };
 
-module.exports = { signup, login, google };
+const logout = async (req, res, next) => {
+  try {
+    res.clearCookie("access_token");
+    res.status(200).json("User has been logged out");
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { signup, login, google, logout };
