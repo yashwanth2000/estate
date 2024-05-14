@@ -1,6 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useRef, useState, useEffect } from "react";
 import { app } from "../firebase";
+import { Link } from "react-router-dom";
 import {
   getStorage,
   ref,
@@ -24,7 +25,9 @@ const Profile = () => {
   const fileRef = useRef(null);
   const dispatch = useDispatch();
   const { currentUser, loading, error } = useSelector((state) => state.user);
-  const avatarUrl = currentUser && (currentUser.rest ? currentUser.rest.avatar : currentUser.avatar);
+  const avatarUrl =
+    currentUser &&
+    (currentUser.rest ? currentUser.rest.avatar : currentUser.avatar);
   const [file, setFile] = useState(undefined);
   const [filePercentage, setFilePercentage] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
@@ -133,7 +136,7 @@ const Profile = () => {
         method: "DELETE",
       });
       const data = await res.json();
-      if(data.success === false){
+      if (data.success === false) {
         dispatch(deleteUserFailure(data.message));
         return;
       }
@@ -141,14 +144,14 @@ const Profile = () => {
     } catch (error) {
       dispatch(deleteUserFailure(error.message));
     }
-  }
+  };
 
   const handleLogOut = async () => {
     try {
       dispatch(logOutStart());
       const res = await fetch("/auth/logout");
       const data = await res.json();
-      if(data.success === false){
+      if (data.success === false) {
         dispatch(logOutFailure(data.message));
         return;
       }
@@ -156,7 +159,7 @@ const Profile = () => {
     } catch (error) {
       dispatch(logOutFailure(error.message));
     }
-  }
+  };
 
   return (
     <div className="flex flex-col items-center p-8 max-w-md mx-auto mt-10 bg-white rounded-lg shadow-md">
@@ -231,19 +234,33 @@ const Profile = () => {
             onChange={handleChange}
           />
         </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors duration-300"
-        >
-          {loading ? "Loading..." : "Update Profile"}
-        </button>
+        <div className="flex flex-col items-center">
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors duration-300 mb-4"
+          >
+            {loading ? "Loading..." : "Update Profile"}
+          </button>
+          <Link
+            className="bg-green-600 w-full py-2 text-white px-4 rounded-md text-center hover:bg-green-700 transition-colors duration-300 mb-4"
+            to="/create-listing"
+          >
+            Create Listing
+          </Link>
+        </div>
       </form>
       <div className="flex justify-between mt-6 w-full">
-        <button className="text-red-600 hover:text-red-700 transition-colors duration-300" onClick={handleDeleteUser}>
+        <button
+          className="text-red-600 hover:text-red-700 transition-colors duration-300"
+          onClick={handleDeleteUser}
+        >
           Delete Account
         </button>
-        <button className="text-red-600 hover:text-red-700 transition-colors duration-300" onClick={handleLogOut}>
+        <button
+          className="text-red-600 hover:text-red-700 transition-colors duration-300"
+          onClick={handleLogOut}
+        >
           Sign Out
         </button>
       </div>
