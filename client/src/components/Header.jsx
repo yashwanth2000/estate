@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 
 export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
+  const avatarUrl = currentUser && (currentUser.rest ? currentUser.rest.avatar : currentUser.avatar);
 
   return (
     <header className="bg-slate-200 shadow-md">
@@ -57,8 +58,8 @@ export default function Header() {
             {currentUser ? (
               <img
                 className="rounded-full h-7 w-7 object-cover"
-                src={currentUser.avatar}
-                alt=""
+                src={avatarUrl}
+                alt="Avatar"
               />
             ) : (
               "Login"

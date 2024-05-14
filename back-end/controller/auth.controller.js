@@ -46,7 +46,7 @@ const google = async (req, res, next) => {
       res
         .cookie("access_token", token, { httpOnly: true })
         .status(200)
-        .json(rest);
+        .json({ success: true, data: rest });
     } else {
       const generatePassword = Math.random().toString(36).slice(-8);
       const hashedPassword = bcrypt.hashSync(generatePassword, 10);
@@ -76,7 +76,7 @@ const google = async (req, res, next) => {
       res
         .cookie("access_token", token, { httpOnly: true })
         .status(200)
-        .json(rest);
+        .json({ success: true, data: rest });
     }
   } catch (error) {
     next(error);

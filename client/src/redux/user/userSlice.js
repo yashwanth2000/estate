@@ -15,6 +15,7 @@ const userSlice = createSlice({
     },
     loginSuccess: (state, action) => {
       state.currentUser = action.payload;
+      //console.log("redux log",state.currentUser);
       state.loading = false;
       state.error = null;
     },
@@ -26,10 +27,16 @@ const userSlice = createSlice({
       state.loading = true;
     },
     updateUserSuccess: (state, action) => {
-      state.currentUser = action.payload;
-      state.loading = false;
-      state.error = null;
-    },
+  if (action.payload.data) {
+    state.currentUser = { ...state.currentUser, ...action.payload.data };
+  } else {
+    const { ...rest } = action.payload;
+    state.currentUser = rest;
+  }
+  state.loading = false;
+  state.error = null;
+  state.updatedAt = new Date().toISOString();
+},
     updateUserFailure: (state, action) => {
       state.error = action.payload;
       state.loading = false;

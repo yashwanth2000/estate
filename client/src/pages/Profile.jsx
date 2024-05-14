@@ -7,12 +7,18 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
-import { updateUserSuccess,updateUserStart,updateUserFailure } from "../redux/user/userSlice";
+import {
+  updateUserSuccess,
+  updateUserStart,
+  updateUserFailure,
+} from "../redux/user/userSlice";
+import { Slide, toast, ToastContainer, Zoom } from "react-toastify";
 
 const Profile = () => {
   const fileRef = useRef(null);
   const dispatch = useDispatch();
-  const { currentUser,loading,error } = useSelector((state) => state.user);
+  const { currentUser, loading, error } = useSelector((state) => state.user);
+  const avatarUrl = currentUser && (currentUser.rest ? currentUser.rest.avatar : currentUser.avatar);
   const [file, setFile] = useState(undefined);
   const [filePercentage, setFilePercentage] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
@@ -51,13 +57,41 @@ const Profile = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const userId = currentUser.rest ? currentUser.rest._id : currentUser._id;
+      const initialUserData = {
+        username: currentUser.rest
+          ? currentUser.rest.username
+          : currentUser.username,
+        email: currentUser.rest ? currentUser.rest.email : currentUser.email,
+        avatar: currentUser.rest ? currentUser.rest.avatar : currentUser.avatar,
+      };
+
+      // Check if any form data has changed
+      const hasChanges = Object.keys(formData).some(
+        (key) => formData[key] !== initialUserData[key]
+      );
+
+      if (!hasChanges) {
+        toast.info("No changes were made.", {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          theme: "dark",
+          transition: Slide,
+        });
+        return;
+      }
+
       dispatch(updateUserStart());
-      const res = await fetch(`/api/user/${currentUser._id}`, {
+      const res = await fetch(`/user/update/${userId}`, {
         method: "POST",
         headers: {
           "content-type": "application/json",
@@ -65,15 +99,25 @@ const Profile = () => {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      if(data.success === false){
+      if (data.success === false) {
         dispatch(updateUserFailure(data.message));
         return;
       }
       dispatch(updateUserSuccess(data));
+      toast.success("Profile updated successfully!", {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "dark",
+        transition: Zoom,
+      });
     } catch (error) {
       dispatch(updateUserFailure(error.message));
     }
-  }
+  };
 
   return (
     <div className="flex flex-col items-center p-8 max-w-md mx-auto mt-10 bg-white rounded-lg shadow-md">
@@ -87,7 +131,7 @@ const Profile = () => {
           hidden
         />
         <img
-          src={formData.avatar || currentUser.avatar}
+          src={formData.avatar || avatarUrl}
           alt="profile"
           className="w-20 h-20 rounded-full object-cover mb-6 mx-auto"
           onClick={() => fileRef.current.click()}
@@ -113,7 +157,11 @@ const Profile = () => {
             type="text"
             id="username"
             className="w-full border-2 border-gray-300 p-2 rounded-md"
-            defaultValue={currentUser.username}
+            defaultValue={
+              currentUser && currentUser.rest
+                ? currentUser.rest.username
+                : currentUser.username
+            }
             onChange={handleChange}
           />
         </div>
@@ -125,7 +173,11 @@ const Profile = () => {
             type="email"
             id="email"
             className="w-full border-2 border-gray-300 p-2 rounded-md"
-            defaultValue={currentUser.email}
+            defaultValue={
+              currentUser && currentUser.rest
+                ? currentUser.rest.email
+                : currentUser.email
+            }
             onChange={handleChange}
           />
         </div>
@@ -145,7 +197,7 @@ const Profile = () => {
           disabled={loading}
           className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors duration-300"
         >
-          {loading ? 'Loading...' : 'Update Profile'}
+          {loading ? "Loading..." : "Update Profile"}
         </button>
       </form>
       <div className="flex justify-between mt-6 w-full">
@@ -156,8 +208,8 @@ const Profile = () => {
           Sign Out
         </button>
       </div>
-      <p className='text-red-700 mt-5'>{error ? error : ''}</p>
-     
+      <p className="text-red-700 mt-5">{error ? error : ""}</p>
+      <ToastContainer />
     </div>
   );
 };
