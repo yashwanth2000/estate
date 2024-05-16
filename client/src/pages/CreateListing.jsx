@@ -140,16 +140,19 @@ export default function CreateListing() {
         },
         body: JSON.stringify({
           ...formData,
-          userRef: currentUser.rest._id,
+          userRef: currentUser._id || currentUser.rest._id,
         }),
       });
       const data = await res.json();
+      
       setLoading(false);
       if (data.success === false) {
+       
         setError(data.message);
       }
       navigate(`/listing/${data._id}`);
     } catch (error) {
+      
       setError(error.message);
       setLoading(false);
     }
