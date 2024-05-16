@@ -34,6 +34,7 @@ const Profile = () => {
   const [formData, setFormData] = useState({});
   const [showListingsError, setShowListingsError] = useState(false);
   const [userListings, setUserListings] = useState([]);
+  const [showListings, setShowListings] = useState(false);
 
   useEffect(() => {
     if (file) {
@@ -164,26 +165,31 @@ const Profile = () => {
   };
 
   const handleShowListings = async () => {
-    try {
-      setShowListingsError(false);
-      const userId = currentUser.rest ? currentUser.rest._id : currentUser._id;
-      const res = await fetch(`/user/listings/${userId}`);
-      const data = await res.json();
-      if (data.success === false) {
-        setShowListingsError(true);
-        return;
-      }
+    setShowListings(!showListings);
+    if (!showListings) {
+      try {
+        setShowListingsError(false);
+        const userId = currentUser.rest
+          ? currentUser.rest._id
+          : currentUser._id;
+        const res = await fetch(`/user/listings/${userId}`);
+        const data = await res.json();
+        if (data.success === false) {
+          setShowListingsError(true);
+          return;
+        }
 
-      setUserListings(data);
-    } catch (error) {
-      setShowListingsError(true);
+        setUserListings(data);
+      } catch (error) {
+        setShowListingsError(true);
+      }
     }
   };
 
   const handleListingDelete = async (listingId) => {
     try {
       const res = await fetch(`/listing/delete/${listingId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
       const data = await res.json();
       if (data.success === false) {
@@ -200,149 +206,190 @@ const Profile = () => {
   };
 
   return (
-    <div className="flex flex-col items-center p-8 max-w-md mx-auto mt-10 bg-white rounded-lg shadow-md">
-      <form onSubmit={handleSubmit} className="w-full">
-        <input
-          onChange={(e) => setFile(e.target.files[0])}
-          type="file"
-          className=""
-          accept="image/*"
-          ref={fileRef}
-          hidden
-        />
-        <img
-          src={formData.avatar || avatarUrl}
-          alt="profile"
-          className="w-20 h-20 rounded-full object-cover mb-6 mx-auto"
-          onClick={() => fileRef.current.click()}
-        />
-        <p className="text-sm self-center mb-4">
-          {fileUploadError ? (
-            <span className="text-red-700">
-              Error Image upload (image must be less than 2 mb)
-            </span>
-          ) : filePercentage > 0 && filePercentage < 100 ? (
-            <span className="text-slate-700">{`Uploading ${filePercentage}%`}</span>
-          ) : filePercentage === 100 ? (
-            <span className="text-green-700">Image successfully uploaded!</span>
-          ) : (
-            ""
-          )}
-        </p>
-        <div className="mb-4">
-          <label htmlFor="username" className="block font-medium mb-2">
-            Username
-          </label>
-          <input
-            type="text"
-            id="username"
-            className="w-full border-2 border-gray-300 p-2 rounded-md"
-            defaultValue={
-              currentUser && currentUser.rest
-                ? currentUser.rest.username
-                : currentUser.username
-            }
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="email" className="block font-medium mb-2">
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            className="w-full border-2 border-gray-300 p-2 rounded-md"
-            defaultValue={
-              currentUser && currentUser.rest
-                ? currentUser.rest.email
-                : currentUser.email
-            }
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-6">
-          <label htmlFor="password" className="block font-medium mb-2">
-            New Password
-          </label>
-          <input
-            type="password"
-            id="password"
-            className="w-full border-2 border-gray-300 p-2 rounded-md"
-            onChange={handleChange}
-          />
-        </div>
-        <div className="flex flex-col items-center">
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors duration-300 mb-4"
-          >
-            {loading ? "Loading..." : "Update Profile"}
-          </button>
-          <Link
-            className="bg-green-600 w-full py-2 text-white px-4 rounded-md text-center hover:bg-green-700 transition-colors duration-300 mb-4"
-            to="/create-listing"
-          >
-            Create Listing
-          </Link>
-        </div>
-      </form>
-      <div className="flex justify-between mt-6 w-full">
-        <button
-          className="text-red-600 hover:text-red-700 transition-colors duration-300"
-          onClick={handleDeleteUser}
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      <main className="container mx-auto px-4 py-8 flex-grow">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-lg shadow-lg p-8 max-w-4xl mx-auto mb-8"
         >
-          Delete Account
-        </button>
-        <button
-          className="text-red-600 hover:text-red-700 transition-colors duration-300"
-          onClick={handleLogOut}
-        >
-          Sign Out
-        </button>
-      </div>
-      <p className="text-red-700 mt-5">{error ? error : ""}</p>
-      <button onClick={handleShowListings} className="text-green-700 w-full">
-        Show Listings
-      </button>
-      
-      <p className="text-red-700 mt-5">
-        {showListingsError ? "Error showing listings" : ""}
-      </p>
-      {userListings && userListings.length > 0 && (
-        <div className="flex flex-col gap-4">
-          <h1 className="text-center mt-7 text-2xl font-semibold">
-            Your Listings
-          </h1>
-          {userListings.map((listing) => (
-            <div
-              key={listing._id}
-              className="border rounded-lg p-3 flex justify-between items-center gap-4"
-            >
-              <Link to={`/listing/${listing._id}`}>
-                <img
-                  src={listing.imageUrls[0]}
-                  alt="listing cover"
-                  className="h-16 w-16 object-contain"
-                />
-              </Link>
-              <Link
-                className="text-slate-700 font-semibold  hover:underline truncate flex-1"
-                to={`/listing/${listing._id}`}
+          <div className="flex justify-center mb-6">
+            <input
+              onChange={(e) => setFile(e.target.files[0])}
+              type="file"
+              className="hidden"
+              accept="image/*"
+              ref={fileRef}
+            />
+            <img
+              src={formData.avatar || avatarUrl}
+              alt="profile"
+              className="w-32 h-32 rounded-full object-cover cursor-pointer"
+              onClick={() => fileRef.current.click()}
+            />
+          </div>
+          <p className="text-sm text-center text-gray-500 mb-6">
+            {fileUploadError ? (
+              <span className="text-red-500">
+                Error Image upload (image must be less than 2 mb)
+              </span>
+            ) : filePercentage > 0 && filePercentage < 100 ? (
+              <span className="text-gray-700">{`Uploading ${filePercentage}%`}</span>
+            ) : filePercentage === 100 ? (
+              <span className="text-green-500">
+                Image successfully uploaded!
+              </span>
+            ) : (
+              ""
+            )}
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label
+                htmlFor="username"
+                className="block text-gray-700 font-bold mb-2"
               >
-                <p>{listing.name}</p>
-              </Link>
-
-              <div className="flex flex-col item-center">
-                <button className="text-red-700 uppercase" onClick={() => handleListingDelete(listing._id)}>Delete</button>
-                <button className="text-green-700 uppercase">Edit</button>
-              </div>
+                Username
+              </label>
+              <input
+                type="text"
+                id="username"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
+                defaultValue={
+                  currentUser && currentUser.rest
+                    ? currentUser.rest.username
+                    : currentUser.username
+                }
+                onChange={handleChange}
+              />
             </div>
-          ))}
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-gray-700 font-bold mb-2"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
+                defaultValue={
+                  currentUser && currentUser.rest
+                    ? currentUser.rest.email
+                    : currentUser.email
+                }
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+          <div className="mt-6">
+            <label
+              htmlFor="password"
+              className="block text-gray-700 font-bold mb-2"
+            >
+              New Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
+              onChange={handleChange}
+            />
+          </div>
+          <div className="flex justify-between mt-8">
+            <button
+              type="submit"
+              disabled={loading}
+              className={`px-6 py-3 text-white font-semibold rounded-md transition-colors duration-300 ${
+                loading
+                  ? "bg-indigo-300 cursor-not-allowed"
+                  : "bg-indigo-600 hover:bg-indigo-700"
+              }`}
+            >
+              {loading ? "Loading..." : "Update Profile"}
+            </button>
+            <Link
+              to="/create-listing"
+              className="px-6 py-3 text-white font-semibold bg-green-600 rounded-md hover:bg-green-700 transition-colors duration-300"
+            >
+              Create Listing
+            </Link>
+          </div>
+          <div className="flex justify-between mt-4">
+            <button
+              className="text-red-600 hover:text-red-700 transition-colors duration-300"
+              onClick={handleDeleteUser}
+            >
+              Delete Account
+            </button>
+            <button
+              className="text-red-600 hover:text-red-700 transition-colors duration-300"
+              onClick={handleLogOut}
+            >
+              Sign Out
+            </button>
+          </div>
+        </form>
+
+        <p className="text-red-600 mt-4 text-center">{error ? error : ""}</p>
+
+        <div className="flex justify-center mt-8">
+          <button
+            onClick={handleShowListings}
+            className={`px-6 py-3 text-white font-semibold rounded-md transition-colors duration-300 ${
+              showListings
+                ? "bg-red-600 hover:bg-red-700"
+                : "bg-green-600 hover:bg-green-700"
+            }`}
+          >
+            {showListings ? "Hide Listings" : "Show Listings"}
+          </button>
         </div>
-      )}
-      <ToastContainer />
+        <p className="text-red-600 mt-4 text-center">
+          {showListingsError ? "Error showing listings" : ""}
+        </p>
+
+        {showListings && userListings && userListings.length > 0 && (
+          <div className="mt-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {userListings.map((listing) => (
+                <div
+                  key={listing._id}
+                  className="bg-white rounded-lg shadow-md overflow-hidden"
+                >
+                  <Link to={`/listing/${listing._id}`}>
+                    <img
+                      src={listing.imageUrls[0]}
+                      alt="listing cover"
+                      className="h-48 w-full object-cover"
+                    />
+                  </Link>
+                  <div className="p-4">
+                    <Link
+                      className="text-gray-800 font-semibold hover:underline truncate"
+                      to={`/listing/${listing._id}`}
+                    >
+                      <p>{listing.name}</p>
+                    </Link>
+                    <div className="flex justify-between mt-4">
+                      <button
+                        className="px-3 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700 transition-colors duration-300"
+                        onClick={() => handleListingDelete(listing._id)}
+                      >
+                        Delete
+                      </button>
+                      <button className="px-3 py-2 text-sm text-white bg-green-600 rounded hover:bg-green-700 transition-colors duration-300">
+                        Edit
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        <ToastContainer />
+      </main>
     </div>
   );
 };
