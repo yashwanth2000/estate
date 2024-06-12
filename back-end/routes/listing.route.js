@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { createListing, deleteListing,updateListing,getListings } = require("../controller/listing.controller");
+const { createListing, deleteListing,updateListing,getListing } = require("../controller/listing.controller");
 const verifyToken = require("../utils/verifyUser");
 
 router.post("/create", verifyToken, createListing);

@@ -378,9 +378,13 @@ const Profile = () => {
                       >
                         Delete
                       </button>
-                      <button className="px-3 py-2 text-sm text-white bg-green-600 rounded hover:bg-green-700 transition-colors duration-300">
-                        Edit
-                      </button>
+                      <Link
+                        to={`/update-listing/${listing._id}`}
+                      >
+                        <button className="px-3 py-2 text-sm text-white bg-green-600 rounded hover:bg-green-700 transition-colors duration-300">
+                          Edit
+                        </button>
+                      </Link>
                     </div>
                   </div>
                 </div>
